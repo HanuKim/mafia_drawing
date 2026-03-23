@@ -210,7 +210,45 @@ socket.on('round_start', ({ round, order }) => {
     }
 });
 
+socket.on('turn_announce', ({ painterId, painterName }) => {
+    currentPainterId = null;
+    currentPhase = 'wait';
+    isMyTurn = false;
+
+    const overlay = document.getElementById('turn-announce-overlay');
+    const card = document.getElementById('turn-announce-card');
+    const labelEl = document.getElementById('turn-announce-label');
+    const nameEl = document.getElementById('turn-announce-name');
+    
+    overlay.classList.remove('hidden');
+    void overlay.offsetWidth; // Reflow for transition
+    card.classList.replace('scale-50', 'scale-100');
+    overlay.classList.replace('opacity-0', 'opacity-100');
+    
+    if (painterId === socket.id) {
+        labelEl.innerText = '당신의 차례입니다!';
+        labelEl.className = 'text-xl font-bold text-emerald-500';
+        nameEl.innerText = '준비하세요!';
+        nameEl.className = 'text-5xl font-black text-emerald-500 p-2 animate-bounce';
+        card.classList.add('border-emerald-400');
+        card.classList.remove('border-transparent');
+    } else {
+        labelEl.innerText = '다음 차례';
+        labelEl.className = 'text-lg font-bold text-slate-500';
+        nameEl.innerText = `${painterName}`;
+        nameEl.className = 'text-4xl font-black text-indigo-600 p-2';
+        card.classList.remove('border-emerald-400');
+        card.classList.add('border-transparent');
+    }
+});
+
 socket.on('turn_start', ({ painterId, painterName, timeLeft }) => {
+    const overlay = document.getElementById('turn-announce-overlay');
+    const card = document.getElementById('turn-announce-card');
+    card.classList.replace('scale-100', 'scale-50');
+    overlay.classList.replace('opacity-100', 'opacity-0');
+    setTimeout(() => overlay.classList.add('hidden'), 300);
+
     isMyTurn = (painterId === socket.id);
     currentPhase = 'draw';
     currentPainterId = painterId;

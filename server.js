@@ -92,15 +92,23 @@ function startTurn(roomId) {
 
     const currentPainter = rd.order[rd.drawCycles % rd.order.length];
 
-    io.to(roomId).emit('turn_start', {
+    io.to(roomId).emit('turn_announce', {
         painterId: currentPainter.id,
-        painterName: currentPainter.name,
-        timeLeft: 10
+        painterName: currentPainter.name
     });
 
     rd.timer = setTimeout(() => {
-        endTurn(roomId);
-    }, 10000);
+        if (!room || room.state !== 'drawing') return;
+        io.to(roomId).emit('turn_start', {
+            painterId: currentPainter.id,
+            painterName: currentPainter.name,
+            timeLeft: 10
+        });
+
+        rd.timer = setTimeout(() => {
+            endTurn(roomId);
+        }, 10000);
+    }, 2500);
 }
 
 function endTurn(roomId) {
