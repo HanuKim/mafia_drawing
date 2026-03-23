@@ -6,7 +6,7 @@ const path = require('path');
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 http.listen(PORT, '0.0.0.0', () => console.log(`Listening on http://localhost:${PORT}`));
 
 const categories = {
